@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
+import { MotionPreference } from './hooks/motion';
 import { ResumeProvider } from './components/ResumeLock';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
@@ -27,24 +28,24 @@ function Atmosphere() {
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <ResumeProvider>
+      <MotionPreference><ResumeProvider>
         <Atmosphere />
         <a className="skip" href="#main">Skip to content</a>
         <Nav />
         <main id="main">
           <Hero />
           <About />
+          <Journey />
           <Expertise />
           <Experience />
           <Architecture />
           <Landscape />
           <Certifications />
-          <Journey />
           <Education />
           <Contact />
         </main>
         <Footer />
-      </ResumeProvider>
+      </ResumeProvider></MotionPreference>
     </MotionConfig>
   );
 }

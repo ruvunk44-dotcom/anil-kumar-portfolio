@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import { useReducedMotion } from '../../hooks/useMedia';
+import { useMotionPreference } from '../../hooks/motion';
 
 // One rAF loop moves small luminous packets port-to-port along every <path data-flow> inside `root`.
 // Positions come from getPointAtLength mapped through getScreenCTM, so it works for any SVG scaling
@@ -10,9 +11,10 @@ interface Opts { perPath?: number; dur?: [number, number]; reverseShare?: number
 export function PacketLayer({ root, perPath = 1, dur = [4.5, 6.5], reverseShare = 0.3, deps = [] }: Opts & { root: RefObject<HTMLElement> }) {
   const layer = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const { paused } = useMotionPreference();
   useEffect(() => {
     const host = root.current, box = layer.current;
-    if (!host || !box) return;
+    if (!host || !box || paused) return;
     const paths = [...host.querySelectorAll<SVGPathElement>('path[data-flow]')];
     const ports = [...host.querySelectorAll<SVGGraphicsElement>('.port')];
     const hub = host.querySelector<HTMLElement>('[data-hub]');
@@ -57,6 +59,6 @@ export function PacketLayer({ root, perPath = 1, dur = [4.5, 6.5], reverseShare 
     io.observe(host);
     return () => { cancelAnimationFrame(raf); io.disconnect(); box.replaceChildren(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [root, reduce, perPath, reverseShare, ...deps]);
+  }, [root, reduce, paused, perPath, reverseShare, ...deps]);
   return <div ref={layer} className="fpkt-layer" aria-hidden="true" />;
 }

@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { about, jobs, landscape, scenarios, certs, journey, education } from '../data/content';
 import { ACCENT_HEX } from './heroGeometry';
@@ -31,7 +31,6 @@ export function About() {
   return (
     <section id="about" className="section wrap about">
       <Reveal className="about-title">
-        <span className="kicker">01 · Introduction</span>
         <h2>{about.title[0]}<br /><span className="grad">{about.title[1]}</span></h2>
         <p>{about.sub}</p>
       </Reveal>
@@ -74,14 +73,14 @@ export function Experience() {
 export function Landscape() {
   const [hot, setHot] = useState<string | null>(null);
   const sc = hot ? scenarios[hot] : null;
-  const Y = (i: number) => 40 + i * 64;
+  const Y = (i: number) => 32 + i * 64;
   const grid = useRef<HTMLDivElement>(null);
   const sideCol = (side: 'l' | 'r') => side === 'l' ? ACCENT_HEX.cyan : ACCENT_HEX.slate;
   const bank = (items: string[], side: 'l' | 'r') => (
     <ul className={`bank bank-${side}`}>
       {items.map((s) => (
         <li key={s}><button type="button" className={`sys${hot === s ? ' on' : ''}${sc?.related.includes(s) ? ' rel' : ''}`} style={v(sideCol(side))}
-          onMouseEnter={() => setHot(s)} onMouseLeave={() => setHot(null)} onFocus={() => setHot(s)} onBlur={() => setHot(null)} aria-describedby="land-detail">{s}</button></li>
+          onClick={() => setHot(s)} onMouseEnter={() => setHot(s)} onFocus={() => setHot(s)} aria-pressed={hot === s} aria-describedby="land-detail">{s}</button></li>
       ))}
     </ul>
   );
@@ -94,7 +93,7 @@ export function Landscape() {
             <PacketLayer root={grid} perPath={2} dur={[4.5, 7]} reverseShare={0.35} />
             {bank(landscape.left, 'l')}
             <svg className="land-lines l" viewBox="0 0 100 384" preserveAspectRatio="none" aria-hidden="true">
-              {landscape.left.map((s, i) => <path key={s} className={hot === s ? 'on' : ''} d={`M0 ${Y(i) + 12} C 50 ${Y(i) + 12}, 50 192, 100 192`} data-flow="out" data-tone="core" />)}
+              {landscape.left.map((s, i) => <path key={s} className={hot === s ? 'on' : ''} d={`M0 ${Y(i)} C 50 ${Y(i)}, 50 192, 100 192`} data-flow="out" data-tone="core" />)}
             </svg>
             <div className="land-core">
               <span className="proto">{landscape.leftProtocols.join('  |  ')}</span>
@@ -102,7 +101,7 @@ export function Landscape() {
               <span className="proto">{landscape.rightProtocols.join('  |  ')}</span>
             </div>
             <svg className="land-lines r" viewBox="0 0 100 384" preserveAspectRatio="none" aria-hidden="true">
-              {landscape.right.map((s, i) => <path key={s} className={hot === s ? 'on' : ''} d={`M0 192 C 50 192, 50 ${Y(i) + 12}, 100 ${Y(i) + 12}`} data-flow="in" />)}
+              {landscape.right.map((s, i) => <path key={s} className={hot === s ? 'on' : ''} d={`M0 192 C 50 192, 50 ${Y(i)}, 100 ${Y(i)}`} data-flow="in" />)}
             </svg>
             {bank(landscape.right, 'r')}
           </div>
@@ -138,19 +137,31 @@ export function Certifications() {
 }
 
 export function Journey() {
+  const root = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const el = root.current; if (!el) return;
+    let inView = true;
+    const sync = () => setVisible(inView && document.visibilityState === 'visible');
+    const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; sync(); });
+    observer.observe(el); document.addEventListener('visibilitychange', sync);
+    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', sync); };
+  }, []);
   return (
-    <section className="section wrap journey-sec" aria-labelledby="journey-title">
+    <section ref={root} className={`section wrap journey-sec${!visible ? ' journey-paused' : ''}`} aria-labelledby="journey-title">
       <SectionHead kicker="07 · Progression" id="journey-title" title="Career journey" sub="From SAP XI/PI to enterprise architecture." />
-      <motion.div className="journey-wrap" initial="hide" whileInView="show" viewport={{ once: true, margin: '0px 0px -15% 0px' }} variants={{ show: { transition: { staggerChildren: 0.12 } } }}>
-        <motion.div className="journey-line" aria-hidden="true" variants={{ hide: { scaleX: 0 }, show: { scaleX: 1, transition: { duration: 1.4, ease: 'easeInOut' } } }} />
-        <motion.ol className="journey" variants={{ show: { transition: { staggerChildren: 0.12 } } }}>
+      <div className="journey-wrap">
+        <div className="journey-line" aria-hidden="true" />
+        <div className="journey-progress" aria-hidden="true" />
+        <div className="journey-runner" aria-hidden="true"><span /></div>
+        <ol className="journey">
         {journey.map((j, i) => (
-          <motion.li key={j} variants={{ hide: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }} className={i === journey.length - 1 ? 'last' : ''}>
+          <li key={j} style={{ ['--step' as string]: i }} className={i === journey.length - 1 ? 'last' : ''}>
             <span className="jdot" aria-hidden="true" /><span className="jnum">{String(i + 1).padStart(2, '0')}</span><span className="jname">{j}</span>
-          </motion.li>
+          </li>
         ))}
-        </motion.ol>
-      </motion.div>
+        </ol>
+      </div>
     </section>
   );
 }

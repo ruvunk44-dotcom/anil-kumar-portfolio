@@ -8,5 +8,6 @@ import '@fontsource/jetbrains-mono/400.css';
 import './styles.css';
 import './v3.css';
 import './theme.css';
+import './cinematic.css';
 import App from './App';
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);

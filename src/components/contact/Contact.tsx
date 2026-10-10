@@ -84,7 +84,7 @@ export function Contact() {
             <div className="cx-id">
               <span className="kicker">09 · Contact</span>
               <h2 id="contact-title">Professional enquiries</h2>
-              <p className="cx-lede">For SAP integration architecture and consulting opportunities.</p>
+              <p className="cx-lede">Open to remote SAP BTP and enterprise integration architecture engagements.</p>
               <dl className="cx-facts">
                 <div><dt>Location</dt><dd>{LOCATION}</dd></div>
                 <div><dt>Email</dt><dd className="cx-mail"><a href={`mailto:${EMAIL}`}>{EMAIL}</a><CopyEmail onDone={(ok) => setToast(ok ? 'Email address copied to clipboard' : 'Could not copy. Please use the email link.')} /></dd></div>
