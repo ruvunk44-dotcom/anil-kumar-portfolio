@@ -116,6 +116,8 @@ export const landscape = {
 };
 
 export const certs = [
+  { year: '2026', title: 'SAP Enterprise Architect', level: 'SAP Certified Professional' },
+  { year: '2025', title: 'Solution Architect – SAP BTP', level: 'SAP Certified Professional' },
   { year: '2023', title: 'SAP Integration Suite', level: 'SAP Certified Development Associate' },
   { year: '2022', title: 'SAP BTP Extensions with SAP Cloud Application Programming Model', level: 'SAP Certified Development Associate' },
   { year: '2019', title: 'SAP Cloud Platform Integration', level: 'SAP Certified Application Associate' },
